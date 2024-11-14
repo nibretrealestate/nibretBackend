@@ -67,6 +67,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
+CSRF_TRUSTED_ORIGINS = ['https://nibret-backend-1.onrender.com']
+CSRF_COOKIE_SECURE = True
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

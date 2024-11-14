@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-
+from django.db import transaction
 from properties.serializers import *
 from properties.permissions import *
 
@@ -50,6 +50,27 @@ class PropertyViewSet(viewsets.ModelViewSet):
         auctions = self.get_queryset().filter(is_auction=True)
         serializer = self.get_serializer(auctions, many=True)
         return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            data = request.data.copy()
+            data['created_by'] =  request.user.id
+            
+            serializer = self.get_serializer(data=data, context={'request': request})
+            serializer.is_valid(raise_exception=True)
+            properties = serializer.save()
+            properties.refresh_from_db()
+            serializer = self.get_serializer(properties)
+
+            headers = self.get_success_headers(serializer.data)
+            return Response({"detail": serializer.data}, status=status.HTTP_201_CREATED, headers=headers)
+        except Exception as e:
+            print(e)
+            return Response(
+                {"detail": f"Something went wrong while creating property"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 
 
 

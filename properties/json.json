@@ -1,0 +1,32 @@
+{
+    "location": {
+        "name": "Bole Atlas, Addis Ababa",
+        "longitude": 38.763611,
+        "latitude": 9.005401
+    },
+    "pictures": [{
+        "is_cover": true,
+        "image_url":"https://console.cloudinary.com/pm/c-52856f20045bfb3a4424c933057071/media-explorer?assetId=2e5e92b579ee52ab7f3d316445469ec3"
+    },
+    {
+        "is_cover": false,
+        "image_url":"https://console.cloudinary.com/pm/c-52856f20045bfb3a4424c933057071/media-explorer?assetId=2e5e92b579ee52ab7f3d316445469ec3"
+    }
+    ],
+    "amenties": {
+        "bedroom": 3,
+        "bathroom": 2,
+        "area": 150, 
+        "property": "apartment"
+    },
+   
+    "name": "Luxury Apartment in Bole",
+    "description": "Modern apartment located in the heart of Bole, walking distance to Bole Medhanialem Church and Dembel City Center. Features high-quality finishing, 24/7 security, and backup power.",
+    "price": 12000000, 
+    "discount": 5, 
+    "sold_out": false,
+    "is_store": false,
+    "type": "apartment",
+    "move_in_date": "2024-12-30T00:00:00Z",
+    "is_auction": true
+}

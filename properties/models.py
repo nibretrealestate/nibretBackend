@@ -1,16 +1,7 @@
-from django.db import models
 import uuid
+from django.db import models
 
-# class User(models.Model):
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-#     name = models.CharField(max_length=255, default="Default Name")
-#     username = models.CharField(max_length=255, unique=True)
-#     password = models.CharField(max_length=255)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-
-#     def __str__(self):
-#         return self.username
+from authentication.models import UserAccount
     
 class Location(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -35,7 +26,7 @@ class Property(models.Model):
     type = models.CharField(max_length=255, null=True, blank=True)
     move_in_date = models.DateTimeField(null=True, blank=True)
     is_auction = models.BooleanField(default=False)
-    # created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_properties')
+    created_by = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='saved_properties')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -88,3 +79,20 @@ class Auction(models.Model):
 
     class Meta:
         verbose_name_plural = "Auctions"
+
+
+class Wishlist(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True) 
+    user =  models.OneToOneField(UserAccount, on_delete=models.CASCADE, related_name='wishlist')
+    properties = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='properties')
+    auctions = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name='auctions') 
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class Reviews(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True) 
+    user =  models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='reviews')
+    properties = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='reviews')
+    review = models.TextField()

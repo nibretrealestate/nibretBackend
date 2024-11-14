@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Location, Property, Image, Amenties, Auction
+from .models import Location, Property, Image, Amenties, Auction, Wishlist, Reviews
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -40,7 +40,7 @@ class PropertySerializer(serializers.ModelSerializer):
         
         # Create location first
         location = Location.objects.create(**location_data)
-        
+        # validated_data['created_by'] = request.user
         # Create property
         property = Property.objects.create(location=location, **validated_data)
         
@@ -64,3 +64,14 @@ class PropertySerializer(serializers.ModelSerializer):
             Amenties.objects.filter(property=instance).update(**amenties_data)
             
         return super().update(instance, validated_data)
+    
+class WishListSerializer(serializers.ModelSerializer):
+      class Meta:
+        model = Wishlist
+        fields = '__all__'
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+      class Meta:
+        model = Reviews
+        fields = '__all__'
