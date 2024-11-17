@@ -171,22 +171,28 @@ AUTH_USER_MODEL = 'authentication.UserAccount'
 ACCOUNT_ADAPTER = 'authentication.adapter.CustomAccountAdapter'
 
 REST_AUTH = {
-    'REGISTER_SERIALIZER': 'authentication.serializers.CustomRegisterSerializer'
+    'REGISTER_SERIALIZER': 'authentication.serializers.CustomRegisterSerializer',
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'jwt-auth',
+    'JWT_AUTH_REFRESH_COOKIE': 'jwt-refresh-token',
+    'JWT_AUTH_RETURN_EXPIRATION': True,
+    'SESSION_LOGIN': False,
 }
 
 REST_FRAMEWORK = {
+     'COERCE_DECIMAL_TO_STRING': False,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
 
-REST_USE_JWT = True
-JWT_AUTH_COOKIE = 'jwt-auth'
-JWT_AUTH_REFRESH_COOKIE = 'jwt-refresh-token'
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=20),
     'ROTATE_REFRESH_TOKENS': True,
     'UPDATE_LAST_LOGIN': True,
 }
+
+JWT_AUTH_SECURE = False
+JWT_AUTH_SAMESITE = 'Lax'
