@@ -15,6 +15,15 @@ class Location(models.Model):
         return self.name
 
 class Property(models.Model):
+
+    TYPE_CHOICES = [
+        ('Plot Land', 'Plot Land'),
+        ('Single Family', 'Single Family'),
+        ('Apartment', 'Apartment'),
+        ('Penthouse', 'Penthouse'),
+        ('Townhouse', 'Townhouse'),
+        ('Townhouse', 'Townhouse'),
+    ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=255)
     description = models.TextField()
@@ -65,12 +74,12 @@ class Auction(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     starting_bid = models.FloatField()
-    current_bid = models.FloatField(null=True, blank=True)
-    min_bid_increment = models.FloatField()
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    location = models.OneToOneField(Location, on_delete=models.CASCADE, related_name='auctions')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
-    property = models.OneToOneField(Property, on_delete=models.CASCADE, related_name='auction')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -84,9 +93,9 @@ class Auction(models.Model):
 class Wishlist(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True) 
     user =  models.OneToOneField(UserAccount, on_delete=models.CASCADE, related_name='wishlist')
-    properties = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='properties')
-    auctions = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name='auctions') 
-
+    property = models.ManyToManyField(Property, related_name='wishlist') 
+    auctions = models.ManyToManyField(Auction, related_name='wishlist') 
+   
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -96,3 +105,11 @@ class Reviews(models.Model):
     user =  models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='reviews')
     properties = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='reviews')
     review = models.TextField()
+
+
+class AuctionImage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    is_cover = models.BooleanField(default=False)
+    image_url = models.CharField(max_length=255)
+    blur_hash = models.CharField(max_length=255, default="blurHash")
+    auction = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name='pictures')

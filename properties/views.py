@@ -133,3 +133,47 @@ class AuctionViewSet(viewsets.ModelViewSet):
         auction.save()
         return Response(self.get_serializer(auction).data)
 
+class WishlistViewSet(viewsets.ModelViewSet):
+    queryset = Wishlist.objects.all()  # Ensure queryset is defined
+    serializer_class = WishListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Filter to return only the wishlist of the logged-in user
+        return self.queryset.filter(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        # Automatically create a wishlist for the user if it doesn't exist
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        return Response(WishListSerializer(wishlist).data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def add_items(self, request):
+        # Get the user's wishlist
+        wishlist = self.get_queryset().first()  # Get the user's wishlist
+
+        if not wishlist:
+            return Response({"error": "Wishlist does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        properties = request.data.get('properties', [])
+        auctions = request.data.get('auctions', [])
+
+        # Add properties to the wishlist
+        if properties:
+            for property_id in properties:
+                try:
+                    property_instance = Property.objects.get(id=property_id)
+                    wishlist.property.add(property_instance)
+                except Property.DoesNotExist:
+                    return Response({"error": f"Property with id {property_id} does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Add auctions to the wishlist
+        if auctions:
+            for auction_id in auctions:
+                try:
+                    auction_instance = Auction.objects.get(id=auction_id)
+                    wishlist.auctions.add(auction_instance)
+                except Auction.DoesNotExist:
+                    return Response({"error": f"Auction with id {auction_id} does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(WishListSerializer(wishlist).data, status=status.HTTP_200_OK)

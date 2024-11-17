@@ -9,7 +9,7 @@ router.register(r'properties', PropertyViewSet)
 router.register(r'images', ImageViewSet)
 router.register(r'amenities', AmentiesViewSet)
 router.register(r'auctions', AuctionViewSet)
-
+router.register(r'wishlist', WishlistViewSet)
 urlpatterns = [
     path('', include(router.urls)),
 ]
