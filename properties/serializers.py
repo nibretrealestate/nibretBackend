@@ -66,7 +66,10 @@ class PropertySerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
     
 class WishListSerializer(serializers.ModelSerializer):
-      class Meta:
+    property = PropertySerializer(many=True, read_only=True)  # Include properties
+    auctions = serializers.PrimaryKeyRelatedField(many=True, queryset=Auction.objects.all())  # Allow IDs for auctions
+
+    class Meta:
         model = Wishlist
         fields = '__all__'
 
