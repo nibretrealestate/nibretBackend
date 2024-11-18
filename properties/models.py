@@ -102,10 +102,10 @@ class Wishlist(models.Model):
 
 class Reviews(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True) 
+    rating = models.FloatField(default=0.0)
     user =  models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='reviews')
     properties = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='reviews')
     review = models.TextField()
-
 
 class AuctionImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -113,3 +113,22 @@ class AuctionImage(models.Model):
     image_url = models.CharField(max_length=255)
     blur_hash = models.CharField(max_length=255, default="blurHash")
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name='pictures')
+
+
+class RequestedTour(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('ACTIVE', 'Active'),
+        ('COMPLETED', 'Completed'),
+        ('CANCELLED', 'Cancelled')
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    date = models.DateTimeField()
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='tours')
+    properties = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='tours')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Tour saved by {self.user.username}-{self.properties.name}"

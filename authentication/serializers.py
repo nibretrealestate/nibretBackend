@@ -6,6 +6,8 @@ from allauth.account.utils import setup_user_email
 
 from dj_rest_auth.registration.serializers import RegisterSerializer
 
+from authentication.models import UserAccount
+
 class CustomRegisterSerializer(RegisterSerializer):
     phone = serializers.CharField(max_length=10, required=True)  # Make it required
     first_name = serializers.CharField(required=True, max_length=5)
@@ -35,3 +37,9 @@ class CustomRegisterSerializer(RegisterSerializer):
         adapter.save_user(request, user, self)
         setup_user_email(request, user, [])
         return user
+    
+
+class UserAccountSerialzer(serializers.ModelSerializer):
+    class Meta:
+        model = UserAccount
+        exclude=['password', 'role']

@@ -80,7 +80,7 @@ class UserAccount(AbstractUser):
     # @property
     # def is_superuser(self):
     #     return self.role == 'admin'
-
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone']
   
 
 

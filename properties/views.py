@@ -134,12 +134,11 @@ class AuctionViewSet(viewsets.ModelViewSet):
         return Response(self.get_serializer(auction).data)
 
 class WishlistViewSet(viewsets.ModelViewSet):
-    queryset = Wishlist.objects.all()  # Ensure queryset is defined
+    queryset = Wishlist.objects.all() 
     serializer_class = WishListSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Filter to return only the wishlist of the logged-in user
         return self.queryset.filter(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
@@ -177,3 +176,25 @@ class WishlistViewSet(viewsets.ModelViewSet):
                     return Response({"error": f"Auction with id {auction_id} does not exist."}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(WishListSerializer(wishlist).data, status=status.HTTP_200_OK)
+    
+class RequestedTourViewSet(viewsets.ModelViewSet):
+    queryset = RequestedTour.objects.all() 
+    serializer_class = TourSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+    
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        request.data['user'] = request.user.department
+
+        serializer = self.get_serializer(data=data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        tour = serializer.save()
+
+        tour.refresh_from_db()
+        serializer = self.get_serializer(receiving_note)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response({"detail": serializer.data}, status=status.HTTP_201_CREATED, headers=headers)

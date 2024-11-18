@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Location, Property, Image, Amenties, Auction, Wishlist, Reviews
+from .models import Location, Property, Image, Amenties, Auction, Wishlist, Reviews, RequestedTour
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -77,4 +77,10 @@ class WishListSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
       class Meta:
         model = Reviews
+        fields = '__all__'
+
+
+class TourSerializer(serializers.ModelSerializer):
+    class Meta:
+        models = RequestedTour
         fields = '__all__'

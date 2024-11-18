@@ -172,6 +172,7 @@ ACCOUNT_ADAPTER = 'authentication.adapter.CustomAccountAdapter'
 
 REST_AUTH = {
     'REGISTER_SERIALIZER': 'authentication.serializers.CustomRegisterSerializer',
+    'USER_DETAILS_SERIALIZER': 'authentication.serializers.UserAccountSerialzer',
     'USE_JWT': True,
     'JWT_AUTH_COOKIE': 'jwt-auth',
     'JWT_AUTH_REFRESH_COOKIE': 'jwt-refresh-token',
