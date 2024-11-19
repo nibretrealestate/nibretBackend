@@ -99,7 +99,12 @@ class ImageViewSet(viewsets.ModelViewSet):
 class AmentiesViewSet(viewsets.ModelViewSet):
     queryset = Amenties.objects.all()
     serializer_class = AmentiesSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [PropertyPermission]
+
+class LoanersViewSet(viewsets.ModelViewSet):
+    queryset = Loaners.objects.all()
+    serializer_class = LoanerSerializers
+
 
 class AuctionViewSet(viewsets.ModelViewSet):
     queryset = Auction.objects.all()

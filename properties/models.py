@@ -13,6 +13,16 @@ class Location(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class Loaners(models.Model):
+   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+   logo = models.CharField(max_length=255) 
+   name = models.CharField(max_length=255) 
+   real_state_provided = models.BooleanField(default=False)
+
+   def __str__(self) -> str:
+       return self.name
 
 class Property(models.Model):
 
@@ -40,11 +50,13 @@ class Property(models.Model):
     move_in_date = models.DateTimeField(null=True, blank=True)
     is_auction = models.BooleanField(default=False)
     created_by = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='saved_properties')
+    loaners = models.ManyToManyField(Loaners, related_name='properties')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
+
 
 class Image(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)

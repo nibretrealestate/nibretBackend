@@ -1,11 +1,17 @@
 from rest_framework import serializers
-from .models import AuctionImage, Location, Property, Image, Amenties, Auction, Wishlist, Reviews, RequestedTour
+from .models import AuctionImage, Location, Property, Image, Amenties, Auction, Wishlist, Reviews, RequestedTour, Loaners
 
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = '__all__'
+
+class LoanerSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Loaners
+        fields = "__all__"
+
 
 class ImageSerializer(serializers.ModelSerializer):
     property = serializers.UUIDField(read_only=True)
@@ -91,7 +97,8 @@ class PropertySerializer(serializers.ModelSerializer):
     pictures = ImageSerializer(many=True)
     amenties = AmentiesSerializer()
     is_wishlisted = serializers.SerializerMethodField()
-
+    loaners = LoanerSerializers(many=True)
+    
     class Meta:
         model = Property
         fields = '__all__'
@@ -111,10 +118,11 @@ class PropertySerializer(serializers.ModelSerializer):
         location_data = validated_data.pop('location')
         amenties_data = validated_data.pop('amenties')
         image_data = validated_data.pop('pictures')
+        loaners_data = validated_data.pop('loaners', [])
         
         # Create location first
         location = Location.objects.create(**location_data)
-        # validated_data['created_by'] = request.user
+        
         # Create property
         property = Property.objects.create(location=location, **validated_data)
         
@@ -122,9 +130,21 @@ class PropertySerializer(serializers.ModelSerializer):
         amenties_data['property'] = property
         Amenties.objects.create(**amenties_data)
 
+        # Handle images
         for image in image_data:
             image['property'] = property
             Image.objects.create(**image)
+        
+        # Handle loaners
+        for loaner_data in loaners_data:
+            loaner, _ = Loaners.objects.get_or_create(
+                name=loaner_data['name'],
+                defaults={
+                    'logo': loaner_data.get('logo', ''),
+                    'real_state_provided': loaner_data.get('real_state_provided', False)
+                }
+            )
+            property.loaners.add(loaner)
         
         return property
 
@@ -136,11 +156,23 @@ class PropertySerializer(serializers.ModelSerializer):
         if 'amenties' in validated_data:
             amenties_data = validated_data.pop('amenties')
             Amenties.objects.filter(property=instance).update(**amenties_data)
+        
+        if 'loaners' in validated_data:
+            loaners_data = validated_data.pop('loaners')
+            instance.loaners.clear()
+            for loaner_data in loaners_data:
+                loaner, _ = Loaners.objects.get_or_create(
+                    name=loaner_data['name'],
+                    defaults={
+                        'logo': loaner_data.get('logo', ''),
+                        'real_state_provided': loaner_data.get('real_state_provided', False)
+                    }
+                )
+                instance.loaners.add(loaner)
             
         return super().update(instance, validated_data)
     
-
-
+    
 class WishListSerializer(serializers.ModelSerializer):
     property = PropertySerializer(many=True, read_only=True)  # Include properties
     auctions = serializers.PrimaryKeyRelatedField(many=True, queryset=Auction.objects.all())  # Allow IDs for auctions
