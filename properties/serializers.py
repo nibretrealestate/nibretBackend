@@ -15,6 +15,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class AmentiesSerializer(serializers.ModelSerializer):
     property = serializers.UUIDField(read_only=True)
+
     class Meta:
         model = Amenties
         fields = '__all__'
@@ -23,10 +24,22 @@ class AuctionSerializer(serializers.ModelSerializer):
     start_date = serializers.SerializerMethodField()
     location = LocationSerializer()
     pictures = ImageSerializer(many=True)
+    is_wishlisted = serializers.SerializerMethodField()
 
     class Meta:
         model = Auction
         fields = '__all__'
+
+    def get_is_wishlisted(self, obj):
+        if hasattr(obj, 'is_wishlisted'):
+            return obj.is_wishlisted
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return Wishlist.objects.filter(
+                user=request.user,
+                auctions=obj 
+            ).exists()
+        return False
 
     def get_start_date(self, obj):
         return obj.start_date.strftime("%Y-%m-%d")
@@ -77,10 +90,22 @@ class PropertySerializer(serializers.ModelSerializer):
     location = LocationSerializer()
     pictures = ImageSerializer(many=True)
     amenties = AmentiesSerializer()
+    is_wishlisted = serializers.SerializerMethodField()
 
     class Meta:
         model = Property
         fields = '__all__'
+
+    def get_is_wishlisted(self, obj):
+        if hasattr(obj, 'is_wishlisted'):
+            return obj.is_wishlisted
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return Wishlist.objects.filter(
+                user=request.user,
+                auctions=obj 
+            ).exists()
+        return False
 
     def create(self, validated_data):
         location_data = validated_data.pop('location')
@@ -114,6 +139,8 @@ class PropertySerializer(serializers.ModelSerializer):
             
         return super().update(instance, validated_data)
     
+
+
 class WishListSerializer(serializers.ModelSerializer):
     property = PropertySerializer(many=True, read_only=True)  # Include properties
     auctions = serializers.PrimaryKeyRelatedField(many=True, queryset=Auction.objects.all())  # Allow IDs for auctions
