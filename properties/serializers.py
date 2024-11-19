@@ -20,12 +20,16 @@ class AmentiesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AuctionSerializer(serializers.ModelSerializer):
+    start_date = serializers.SerializerMethodField()
     location = LocationSerializer()
     pictures = ImageSerializer(many=True)
 
     class Meta:
         model = Auction
         fields = '__all__'
+
+    def get_start_date(self, obj):
+        return obj.start_date.strftime("%Y-%m-%d")
 
     def create(self, validated_data):
         # Extract nested data
