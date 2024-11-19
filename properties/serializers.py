@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Location, Property, Image, Amenties, Auction, Wishlist, Reviews, RequestedTour
+from .models import AuctionImage, Location, Property, Image, Amenties, Auction, Wishlist, Reviews, RequestedTour
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -20,9 +20,54 @@ class AmentiesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AuctionSerializer(serializers.ModelSerializer):
+    location = LocationSerializer()
+    pictures = ImageSerializer(many=True)
+
     class Meta:
         model = Auction
         fields = '__all__'
+
+    def create(self, validated_data):
+        # Extract nested data
+        location_data = validated_data.pop('location')
+        pictures_data = validated_data.pop('pictures', [])
+
+        # Create location first
+        location = Location.objects.create(**location_data)
+
+        # Create auction with the location
+        auction = Auction.objects.create(location=location, **validated_data)
+
+        # Create pictures
+        for picture_data in pictures_data:
+            AuctionImage.objects.create(auction=auction, **picture_data)
+
+        return auction
+
+    def update(self, instance, validated_data):
+        # Handle location update
+        if 'location' in validated_data:
+            location_data = validated_data.pop('location')
+            location = instance.location
+            for attr, value in location_data.items():
+                setattr(location, attr, value)
+            location.save()
+
+        # Handle pictures update
+        if 'pictures' in validated_data:
+            pictures_data = validated_data.pop('pictures')
+            # Optional: Delete existing pictures
+            instance.pictures.all().delete()
+            # Create new pictures
+            for picture_data in pictures_data:
+                AuctionImage.objects.create(auction=instance, **picture_data)
+
+        # Update remaining auction fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
 
 class PropertySerializer(serializers.ModelSerializer):
     location = LocationSerializer()
