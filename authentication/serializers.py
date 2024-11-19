@@ -42,4 +42,4 @@ class CustomRegisterSerializer(RegisterSerializer):
 class UserAccountSerialzer(serializers.ModelSerializer):
     class Meta:
         model = UserAccount
-        exclude=['password', 'role']
+        fields=['first_name', 'last_name', 'email', 'phone']

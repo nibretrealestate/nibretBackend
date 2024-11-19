@@ -46,7 +46,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
         return queryset
 
     @action(detail=False, methods=['get'])
-    def auctions(self):
+    def auctions(self, request, *args, **kwargs):
         auctions = self.get_queryset().filter(is_auction=True)
         serializer = self.get_serializer(auctions, many=True)
         return Response(serializer.data)
