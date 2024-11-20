@@ -50,14 +50,17 @@ class Property(models.Model):
     move_in_date = models.DateTimeField(null=True, blank=True)
     is_auction = models.BooleanField(default=False)
     created_by = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='saved_properties')
-    loaners = models.ManyToManyField(Loaners, related_name='properties')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
 
-
+class LoanerProperty(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    loaner  = models.ForeignKey(Loaners, on_delete=models.CASCADE, related_name='property')
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='loaners', null=True, blank=True)
+    description = description = models.TextField(null=True, blank=True)
 class Image(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     is_cover = models.BooleanField(default=False)
