@@ -103,7 +103,7 @@ class Auction(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Auction for {self.property.name}"
+        return f"Auction for {self.name}"
 
     class Meta:
         verbose_name_plural = "Auctions"
@@ -112,8 +112,8 @@ class Auction(models.Model):
 class Wishlist(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True) 
     user =  models.OneToOneField(UserAccount, on_delete=models.CASCADE, related_name='wishlist')
-    property = models.ManyToManyField(Property, related_name='wishlist') 
-    auctions = models.ManyToManyField(Auction, related_name='wishlist') 
+    property = models.ManyToManyField(Property, related_name='property_wishlist', blank=True) 
+    auctions = models.ManyToManyField(Auction, related_name='auction_wishlist', blank=True) 
    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

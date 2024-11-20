@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AuctionImage, Location, Property, Image, Amenties, Auction, Wishlist, Reviews, RequestedTour, Loaners
+from .models import AuctionImage, LoanerProperty, Location, Property, Image, Amenties, Auction, Wishlist, Reviews, RequestedTour, Loaners
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -91,6 +91,12 @@ class AuctionSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+    
+class LoanerPropertySerializer(serializers.ModelSerializer):
+    loaners = LoanerSerializers(many=True)
+    class Meta:
+        model = LoanerProperty
+        fields = '__all__'
 
 class PropertySerializer(serializers.ModelSerializer):
     location = LocationSerializer()
@@ -110,7 +116,8 @@ class PropertySerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return Wishlist.objects.filter(
                 user=request.user,
-                auctions=obj 
+                property=obj
+
             ).exists()
         return False
 
@@ -172,10 +179,12 @@ class PropertySerializer(serializers.ModelSerializer):
             
         return super().update(instance, validated_data)
     
-    
+
+
+
 class WishListSerializer(serializers.ModelSerializer):
-    property = PropertySerializer(many=True, read_only=True)  # Include properties
-    auctions = serializers.PrimaryKeyRelatedField(many=True, queryset=Auction.objects.all())  # Allow IDs for auctions
+    property = PropertySerializer(many=True) 
+    auctions = AuctionSerializer(many=True)
 
     class Meta:
         model = Wishlist

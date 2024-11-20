@@ -147,50 +147,54 @@ class WishlistViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        # Automatically create a wishlist for the user if it doesn't exist
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         return Response(WishListSerializer(wishlist).data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def add_items(self, request):
-        # Get the user's wishlist
-        wishlist = self.get_queryset().first()
-
-        if not wishlist:
-            return Response(
-                {"error": "Wishlist does not exist."}, 
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        item_id = request.data.get('item_id')
-        is_wishlisted = request.data.get('is_wishlisted', 'true').lower() == 'true'
-        is_property = request.data.get('is_property', 'true').lower() == 'true'
-
         try:
-            if is_property:
-                property_instance = Property.objects.get(id=item_id)
-                if is_wishlisted:
-                    wishlist.property.add(property_instance)
-                else:
-                    wishlist.property.remove(property_instance)
-            else:
-                auction_instance = Auction.objects.get(id=item_id)
-                if is_wishlisted:
-                    wishlist.auctions.add(auction_instance)
-                else:
-                    wishlist.auctions.remove(auction_instance)
+            wishlist = self.get_queryset().first()
+            if not wishlist:
+                return Response(
+                    {"error": "Wishlist does not exist."}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
+            item_id = request.data.get('item_id')
+            is_wishlisted = str(request.data.get('is_wishlisted', 'true')).lower() == 'true'
+            is_property = str(request.data.get('is_property', 'true')).lower() == 'true'
+
+            if is_property:
+                try:
+                    property_instance = Property.objects.get(id=item_id)
+                    if is_wishlisted:
+                        wishlist.property.add(property_instance)
+                    else:
+                        wishlist.property.remove(property_instance)
+                except Property.DoesNotExist:
+                    return Response(
+                        {"error": f"Property with id {item_id} does not exist."}, 
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            else:
+                try:
+                    auction_instance = Auction.objects.get(id=item_id)
+                    if is_wishlisted:
+                        wishlist.auctions.add(auction_instance)
+                    else:
+                        wishlist.auctions.remove(auction_instance)
+                except Auction.DoesNotExist:
+                    return Response(
+                        {"error": f"Auction with id {item_id} does not exist."}, 
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            wishlist.refresh_from_db()
             return Response(
                 WishListSerializer(wishlist).data, 
                 status=status.HTTP_200_OK
             )
 
-        except (Property.DoesNotExist, Auction.DoesNotExist):
-            item_type = "Property" if is_property else "Auction"
-            return Response(
-                {"error": f"{item_type} with id {item_id} does not exist."}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
         except Exception as e:
             return Response(
                 {"error": f"An error occurred: {str(e)}"}, 
