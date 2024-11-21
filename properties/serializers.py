@@ -7,10 +7,9 @@ class LocationSerializer(serializers.ModelSerializer):
         model = Location
         fields = '__all__'
 
-class LoanerSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Loaners
-        fields = "__all__"
+class LoanersPropertySerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = LoanerProperty
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -92,18 +91,24 @@ class AuctionSerializer(serializers.ModelSerializer):
 
         return instance
     
+class LoanerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Loaners
+        fields = ['id', 'name', 'real_state_provided', 'logo', 'phone']
+
 class LoanerPropertySerializer(serializers.ModelSerializer):
-    loaners = LoanerSerializers(many=True)
+    loaner = LoanerSerializer() 
+    
     class Meta:
         model = LoanerProperty
-        fields = '__all__'
+        fields = ['id', 'loaner', 'description']
 
 class PropertySerializer(serializers.ModelSerializer):
     location = LocationSerializer()
     pictures = ImageSerializer(many=True)
     amenties = AmentiesSerializer()
     is_wishlisted = serializers.SerializerMethodField()
-    loaners = LoanerSerializers(many=True)
+    loaner_detail = LoanerPropertySerializer(source='loaners', many=True, read_only=True)
     
     class Meta:
         model = Property

@@ -103,7 +103,7 @@ class AmentiesViewSet(viewsets.ModelViewSet):
 
 class LoanersViewSet(viewsets.ModelViewSet):
     queryset = Loaners.objects.all()
-    serializer_class = LoanerSerializers
+    serializer_class = LoanerSerializer
 
 
 class AuctionViewSet(viewsets.ModelViewSet):

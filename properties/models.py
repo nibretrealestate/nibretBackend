@@ -20,6 +20,7 @@ class Loaners(models.Model):
    logo = models.CharField(max_length=255) 
    name = models.CharField(max_length=255) 
    real_state_provided = models.BooleanField(default=False)
+   phone = models.CharField(max_length=255, null=True, blank=True) 
 
    def __str__(self) -> str:
        return self.name
