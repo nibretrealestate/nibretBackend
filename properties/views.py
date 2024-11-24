@@ -210,14 +210,14 @@ class RequestedTourViewSet(viewsets.ModelViewSet):
     
 def create(self, request, *args, **kwargs):
     data = request.data.copy()
-    data['user'] = request.user.id  # Add user to the copied data
+    data['user'] = request.user.id 
 
     serializer = self.get_serializer(data=data, context={'request': request})
     serializer.is_valid(raise_exception=True)
     tour = serializer.save()
 
     tour.refresh_from_db()
-    serializer = self.get_serializer(tour)  # Fixed variable name
+    serializer = self.get_serializer(tour)
 
     headers = self.get_success_headers(serializer.data)
     return Response({"detail": serializer.data}, status=status.HTTP_201_CREATED, headers=headers)
