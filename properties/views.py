@@ -208,16 +208,16 @@ class RequestedTourViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
     
-    def create(self, request, *args, **kwargs):
-        data = request.data.copy()
-        request.data['user'] = request.user.id
+def create(self, request, *args, **kwargs):
+    data = request.data.copy()
+    data['user'] = request.user.id  # Add user to the copied data
 
-        serializer = self.get_serializer(data=data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        tour = serializer.save()
+    serializer = self.get_serializer(data=data, context={'request': request})
+    serializer.is_valid(raise_exception=True)
+    tour = serializer.save()
 
-        tour.refresh_from_db()
-        serializer = self.get_serializer(receiving_note)
+    tour.refresh_from_db()
+    serializer = self.get_serializer(tour)  # Fixed variable name
 
-        headers = self.get_success_headers(serializer.data)
-        return Response({"detail": serializer.data}, status=status.HTTP_201_CREATED, headers=headers)
+    headers = self.get_success_headers(serializer.data)
+    return Response({"detail": serializer.data}, status=status.HTTP_201_CREATED, headers=headers)
