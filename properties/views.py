@@ -210,7 +210,7 @@ class RequestedTourViewSet(viewsets.ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
-        request.data['user'] = request.user.department
+        request.data['user'] = request.user.id
 
         serializer = self.get_serializer(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)
