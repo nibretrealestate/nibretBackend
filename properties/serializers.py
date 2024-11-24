@@ -204,5 +204,5 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class TourSerializer(serializers.ModelSerializer):
     class Meta:
-        models = RequestedTour
+        model = RequestedTour
         fields = '__all__'
