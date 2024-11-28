@@ -13,8 +13,7 @@ class Location(models.Model):
 
     def __str__(self):
         return self.name
-    
-
+        
 class Loaners(models.Model):
    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
    logo = models.CharField(max_length=255) 
@@ -24,6 +23,22 @@ class Loaners(models.Model):
 
    def __str__(self) -> str:
        return self.name
+
+class Criteria(models.Model):
+   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+   description = models.TextField()
+
+
+class HomeLoan(models.Model):
+   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+   name = models.CharField(max_length=255) 
+   description = models.TextField()
+   loaner = models.ForeignKey(Loaners,on_delete=models.CASCADE,  related_name="loaner")
+   criterias = models.ForeignKey(Criteria, on_delete=models.CASCADE, related_name="home_loan")
+   
+   def __str__(self):
+        return self.name
+
 
 class Property(models.Model):
 
@@ -37,7 +52,7 @@ class Property(models.Model):
         ('Commercial', 'Commercial'),
         ('Condominium', 'Condominium'),
         ('Office Space', 'Office Space'),
-         ('Warehouse', 'Warehouse'),
+        ('Warehouse', 'Warehouse'),
     ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=255)
@@ -49,7 +64,7 @@ class Property(models.Model):
     is_store = models.BooleanField(default=False)
     type = models.CharField(max_length=255, null=True, blank=True)
     move_in_date = models.DateTimeField(null=True, blank=True)
-    is_auction = models.BooleanField(default=False)
+    rental = models.BooleanField(default=False)
     created_by = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='saved_properties')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

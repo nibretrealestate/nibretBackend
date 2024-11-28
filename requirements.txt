@@ -16,8 +16,7 @@ isodate==0.7.2
 lxml==5.3.0
 Markdown==3.7
 oauthlib==3.2.2
-psycopg==3.2.3
-psycopg2==2.9.10
+psycopg2-binary
 pycparser==2.22
 PyJWT==2.9.0
 python-dotenv==1.0.1

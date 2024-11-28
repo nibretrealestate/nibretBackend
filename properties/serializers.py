@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AuctionImage, LoanerProperty, Location, Property, Image, Amenties, Auction, Wishlist, Reviews, RequestedTour, Loaners
+from .models import AuctionImage, HomeLoan, LoanerProperty, Location, Property, Image, Amenties, Auction, Wishlist, Reviews, RequestedTour, Loaners
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -10,8 +10,11 @@ class LocationSerializer(serializers.ModelSerializer):
 class LoanersPropertySerializer(serializers.ModelSerializer):
     class Meta: 
         model = LoanerProperty
-
-
+    
+class HomeLoanSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = HomeLoan
+    
 class ImageSerializer(serializers.ModelSerializer):
     property = serializers.UUIDField(read_only=True)
     class Meta:
